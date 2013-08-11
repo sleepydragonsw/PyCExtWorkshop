@@ -1,1 +1,7 @@
 /doc/_build/
+/build/
+/denver_d.pyd
+
+# a file named None is produced when the module is compiled;
+# is is the Visual Studio "PDB" file, with the debugging symbols
+None
