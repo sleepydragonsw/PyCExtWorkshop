@@ -17,9 +17,9 @@ which is specified in *Python.h* :
 
 .. code-block:: c
 
-    typedef PyObject \*(\*PyCFunction)(PyObject \*, PyObject \*);
+    typedef PyObject *(*PyCFunction)(PyObject *, PyObject *);
 
-If this syntax looks strange,
+If this syntax is unfamiliar to you,
 it just means that you must write a function
 that accepts two pointers to PyObject structs
 and returns a pointer to a PyObject struct.
@@ -66,7 +66,7 @@ Add the Function to the Function List
 
 Do you remember the *PyMethodDef* list that ended with ``{NULL, NULL, 0, NULL}``
 that you added to your C file an earlier project?
-This is the list to which your new C function need to be added
+This is the list to which your new C function needs to be added
 in order to make it callable from Python.
 
 Here is the new code to use in *denver.c* to expose your function to Python:
@@ -86,15 +86,17 @@ A *PyMethodDef* struct has 4 members:
         the C function that is to be invoked when called from Python.
     *ml_flags* (int)
         flags that affect how the C function is invoked;
-        for example, =METH_NOARGS= indicates that the function accepts no arguments
-        and =METH_VARARGS= indicates that the function accepts positional arguments
+        for example, ``METH_NOARGS`` indicates that the function accepts no arguments
+        and ``METH_VARARGS`` indicates that the function accepts positional arguments
         but not keyword arguments.
     *ml_doc* (const char \*)
         the docstring for the function;
-        this string will be available from Python via the __doc__ attribute of the function;
-        may be NULL to not add a docstring to the function.
+        this string will be available from Python
+        via the ``__doc__`` attribute of the function;
+        may be ``NULL`` to not add a docstring to the function.
 
-With this change, the *denver_hello_world* C function can be called from Python.
+With this change, the ``denver_hello_world`` C function
+can be called from Python.
 Compile your module and give it a try!
 
 .. code-block:: text
@@ -117,4 +119,4 @@ Compile your module and give it a try!
     [43202 refs]
     >>>
 
-Notice how "Hello World" was printed when the =hello_world()= was invoked.
+Notice how "Hello World" was printed when the ``hello_world()`` was invoked.
