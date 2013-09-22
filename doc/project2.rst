@@ -13,41 +13,15 @@ we will create an extension module with
 zero functions, zero classes, zero attributes... an empty module.
 If your extension module can be imported, you have completed this project.
 
-Create setup.py
----------------
-
-The first step of creating a Python extension module
-is to write a brief Python script that uses the built-in *distutils* module
-to issue the necessary commands to compile the C code.
-By convention, this file is named *setup.py*.
-
-For the name of your extension module use your first name.
-My name is Denver Coneybeare, so my extension module name will be *denver*.
-This name will need to be specified in *setup.py*, as follows:
-
-.. code-block:: python
-
-    # -*- coding: utf-8 -*-
-
-    import distutils.core
-
-    ext_module = distutils.core.Extension(
-        "denver",
-        sources=["denver.c"],
-    )
-
-    distutils.core.setup(
-        ext_modules=[ext_module],
-    )
-
-Of course, replace *denver* with the name of *your* extension module.
-
 Create denver.c
 ---------------
 
-Now, let's create the actual C source code for your new extension module.
-Since my name is Denver, I've named my C source file *denver.c*;
-however, you must use whatever filename you specified in *setup.py*.
+Let's create the actual C source code for your new extension module.
+For the name of your extension module use your first name.
+My name is Denver Coneybeare, so my extension module name will be *denver*
+and will be contained in a file named *denver.c*.
+Make sure to substitute each occurrence of "denver"
+in the steps that follow with the name of your module.
 
 Include Python.h
 ................
@@ -118,6 +92,31 @@ which creates the module object for your extension module:
     initdenver(void) {
         Py_InitModule("denver", denver_functions);
     }
+
+Create setup.py
+---------------
+
+The last step of creating a Python extension module
+is to write a brief Python script that uses the built-in *distutils* module
+to issue the necessary commands to compile the C code.
+By convention, this file is named *setup.py*.
+
+.. code-block:: python
+
+    # -*- coding: utf-8 -*-
+
+    import distutils.core
+
+    ext_module = distutils.core.Extension(
+        "denver",
+        sources=["denver.c"],
+    )
+
+    distutils.core.setup(
+        ext_modules=[ext_module],
+    )
+
+Of course, replace *denver* with the name of *your* extension module.
 
 Compile Your Extension Module
 -----------------------------
