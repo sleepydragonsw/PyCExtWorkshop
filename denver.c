@@ -20,7 +20,9 @@ denver_hello_you(
     if (! PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
+    Py_BEGIN_ALLOW_THREADS
     nCharsPrinted = printf("Hello %s\n", name);
+    Py_END_ALLOW_THREADS
     retval = PyInt_FromLong(nCharsPrinted);
     return retval;
 }
