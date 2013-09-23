@@ -15,11 +15,14 @@ denver_hello_you(
     PyObject *args
 ) {
     const char *name;
+    long nCharsPrinted;
+    PyObject *retval;
     if (! PyArg_ParseTuple(args, "s", &name)) {
         return NULL;
     }
-    printf("Hello %s\n", name);
-    Py_RETURN_NONE;
+    nCharsPrinted = printf("Hello %s\n", name);
+    retval = PyInt_FromLong(nCharsPrinted);
+    return retval;
 }
 
 static PyMethodDef denver_functions[] = {
