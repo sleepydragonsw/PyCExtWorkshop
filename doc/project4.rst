@@ -164,7 +164,7 @@ Add this line into the *PyMethodDef* list, to become:
 
 
 Compile and Try It
-==================
+------------------
 
 Compile your module and give it a try!
 

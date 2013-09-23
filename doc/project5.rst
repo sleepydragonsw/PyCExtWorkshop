@@ -64,7 +64,7 @@ to return ``None`` from ``hello_you()``.
 
 
 Compile and Try It
-==================
+------------------
 
 Compile your module and give it a try!
 
