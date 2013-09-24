@@ -1,104 +1,174 @@
-Project 6: Releasing The GIL
-============================
+Project 6: Calculating PNG Image Size Using libpng
+==================================================
 
 Introduction
 ------------
 
-In this project you will extend the "hello you" function
-to release the global interpreter lock during the printf call.
+In this project you will "fill in the blanks" of a function
+that uses the open-source PNG image library "libpng"
+to determine the height and width of a PNG image.
+This function is fully robust and handles all errors.
+
+You will need to use all knowledge learned up to this point
+in order to complete this project,
+along with some new things that will be introduced,
+such as raising exceptions, memory management, and using third-party DLLs.
 
 
-The GIL
--------
+Compile libpng
+--------------
 
-One of the highly controversial aspects of the Python programming language
-is a concept called the "Global Interpreter Lock", or simply "The GIL".
-As its name implies, only one Python thread at a time can hold the GIL
-and therefore can proceed;
-all other Python threads must wait in line for the GIL
-before they can execute.
-This has serious implications for multithreaded Python applications
-that perform a lot of CPU computation
-and causes them to perform badly compared to languages without such a lock
-like Java and C++.
+In this step you will compile libpng for yourself.
 
-The GIL only needs to be held during times when Python objects
-are being created, deleted, accessed, or manipulated.
-In order to allow other threads to run,
-Python C extension modules should release the GIL
-whenever they perform an operation that does not require Python objects.
-This is especially true for I/O operations, like ``printf``,
-which actually take a "long time" to run
-and does not require access to any Python objects.
+  1. Download the source code for the latest version of libpng
+     (which at the time of writing is 1.6.6)
+     from http://libpng.org/pub/png/libpng.html.
+  2. Extract the downloaded file
+     (in my case ``lpng166.zip``)
+     somewhere on your computer.
+  3. Open ``projects\vstudio\vstudio.sln`` in Visual Studio 2010
+  4. In the drop-down listbox at the top of the screen
+     change "Release" to "Debug Library"
+     (see screenshot below)
+  5. Press F7 to compile libpng; this should take less than 5 minutes
 
-To release the GIL use the
-`Py_BEGIN_ALLOW_THREADS <http://docs.python.org/2/c-api/init.html#Py_BEGIN_ALLOW_THREADS>`_
-macro.
-To re-acquire the GIL use the
-`Py_END_ALLOW_THREADS <http://docs.python.org/2/c-api/init.html#Py_END_ALLOW_THREADS>`_
-macro.
+.. image:: images/BuildConfigScreenshot.png
 
-As an example, here is how to use the macro with the ``printf()`` function:
+If successful, the file ``projects\vstudio\Debug\libpng16.dll``
+will have been created.
+
+
+png_dimensions() Function Skeleton
+----------------------------------
+
+Below is an implementation of a Python C extension function
+that reads the width and height (in pixels) of a PNG image.
+However, there are lots of "holes" in it
+that you will be implementing in the following sections.
+
+For now, copy and paste this code into the C source file
+for your extension module (eg. ``denver.c``):
 
 .. code-block:: c
 
-   Py_BEGIN_ALLOW_THREADS
-   nCharsPrinted = printf("Hello %s\n", name);
-   Py_END_ALLOW_THREADS
+    #include <png.h>
 
-The complete, robust, and multithreading-friendly ``hello_you()`` function is now:
+    static void
+    denver_png_read_fn(
+        png_structp png_ptr,
+        png_bytep data,
+        png_size_t length
+    ) {
+        FILE *f;
+        png_size_t check;
+        f = (FILE*) png_get_io_ptr(png_ptr);
+        check = fread(data, 1, length, f);
+        if (check < length) {
+            if (ferror(f)) {
+                // TODO: set exception from errno
+            } else {
+                // TODO: set exception due to premature end-of-file
+            }
+            png_longjmp(png_ptr, 1);
+        }
+    }
 
-.. code-block:: c
+    static void
+    denver_png_error_fn(
+        png_structp png_ptr,
+        png_const_charp message
+    ) {
+        if (! PyErr_Occurred()) {
+            // TODO: set exception with the given message
+        }
+        png_longjmp(png_ptr, 1);
+    }
 
     static PyObject *
-    denver_hello_you(
+    denver_png_dimensions(
         PyObject *module,
         PyObject *args
     ) {
-        const char *name;
-        long nCharsPrinted;
-        PyObject *retval;
-        if (! PyArg_ParseTuple(args, "s", &name)) {
-            return NULL;
+        FILE *f;
+        char *path;
+        size_t n;
+        char buf[8];
+        int isPng;
+        png_structp png_ptr = NULL;
+        png_inforp info_ptr = NULL;
+        png_uint_32 image_width, image_height;
+        PyObject *retval, *widthObj, *heightObj;
+
+        // TODO: replace the hardcoded path with an argument to the function (hint: PyArg_ParseTuple)
+        path = "test.png";
+
+        f = fopen(path, "rb");
+        if (!f) {
+            // TODO: set exception from errno
+            Py_RETURN_NONE;
         }
-        Py_BEGIN_ALLOW_THREADS
-        nCharsPrinted = printf("Hello %s\n", name);
-        Py_END_ALLOW_THREADS
-        retval = PyInt_FromLong(nCharsPrinted);
-        return retval;
+
+        n = fread(buf, 1, 8, f);
+        if (n == 0) {
+            fclose(f);
+            // TODO: set exception from errno
+            Py_RETURN_NONE;
+        }
+
+        isPng = png_check_sig(buf, n);
+        if (! isPng) {
+            fclose(f);
+            // TODO: raise a ValueError whose message indicates invalid PNG signature
+            Py_RETURN_NONE;
+        }
+
+        png_ptr = png_create_read_struct(
+            PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+        if (! png_ptr) {
+            fclose(f);
+            // TODO: raise exception using the special "no memory" function
+            Py_RETURN_NONE;
+        }
+
+        info_ptr = png_create_info_struct(png_ptr);
+        if (! info_ptr) {
+            png_destroy_read_struct(&png_ptr, NULL, NULL);
+            fclose(f);
+            // TODO: raise exception using the special "no memory" function
+            Py_RETURN_NONE;
+        }
+
+        if (setjmp(png_jmpbuf(png_ptr)) != 0) {
+            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+            fclose(f);
+            // TODO: return NULL once all error handling is implemented
+            Py_RETURN_NONE;
+        }
+
+        png_set_read_fn(png_ptr, f, denver_png_read_fn);
+        png_set_error_fn(png_ptr, NULL, denver_png_error_fn, NULL);
+        png_set_sig_bytes(png_ptr, n);
+
+        png_read_info(png_ptr, info_ptr);
+        image_width = png_get_image_width(png_ptr, info_ptr);
+        image_height = png_get_image_height(png_ptr, info_ptr);
+
+        png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+        fclose(f);
+
+        widthObj = PyInt_FromLong(image_width);
+        // TODO: handle out-of-memory error
+
+        heightObj = PyInt_FromLong(image_height);
+        // TODO: handle out-of-memory error; make sure to use Py_DECREF
+        // for any newly-created Python objects created above
+
+        // TODO: create a tuple containing the width and heigh objects
+        // and return it
+        Py_RETURN_NONE;
     }
 
-Notice the introduction of
-``Py_BEGIN_ALLOW_THREADS`` and ``Py_END_ALLOW_THREADS``
-around the call to ``printf()``.
 
-
-Compile and Try It
-------------------
-
-Compile your module and give it a try!
-There should be no noticable difference from the last project
-but you can feel good that you are doing your part
-to minimize the negative effects of the GIL on multithreaded programs.
-
-.. code-block:: text
-
-    c:\dev\cpyextworkshop>python_d setup.py build_ext --inplace --debug
-    running build_ext
-    building 'denver' extension
-    c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\BIN\cl.exe /c /nologo /Od /MDd /W3 /GS- /Z7 /D_DEBUG -Ic:\dev\py\Python-2.7.5\include -Ic:\dev\py\Python-2.7.5\PC /Tcc:\dev\cpyextworkshop\denver.c /Fobuild\temp.win32-2.7-pydebug\Debug\denver.obj denver.c
-    c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\BIN\link.exe /DLL /nologo /INCREMENTAL:no /DEBUG /pdb:None /LIBPATH:c:\dev\py\Python-2.7.5\libs /LIBPATH:c:\dev\py\Python-2.7.5\PCbuild /EXPORT:initdenver build\temp.win32-2.7-pydebug\Debug\denver.obj /OUT:c:\dev\cpyextworkshop\denver_d.pyd /MANIFEST /IMPLIB:build\temp.win32-2.7-pydebug\Debug\denver_d.lib /MANIFESTFILE:build\temp.win32-2.7-pydebug\Debug\denver_d.pyd.manifest
-       Creating library build\temp.win32-2.7-pydebug\Debug\denver_d.lib and object build\temp.win32-2.7-pydebug\Debug\denver_d.exp
-    [36809 refs]
-
-    c:\dev\cpyextworkshop>python_d
-    Python 2.7.5 (default, Jul  1 2013, 15:26:31) [MSC v.1600 32 bit (Intel)] on win32
-    Type "help", "copyright", "credits" or "license" for more information.
-    >>> import denver
-    [43251 refs]
-    >>> denver.hello_you("Mark")
-    Hello Mark
-    11
-    [43253 refs]
-    >>>
+Add png_dimensions() to Function Table
+--------------------------------------
 
