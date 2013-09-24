@@ -52,6 +52,49 @@ will have been created.
 .. image:: images/BuildConfigScreenshot.png
 
 
+Prepare setup.py
+----------------
+
+Before you can compile the module with ``png_dimensions()``,
+you need to update ``setup.py`` to tell it about libpng.
+Specifically, you need to add the
+``include_dirs``, ``library_dirs``, and ``libraries``
+arguments to the ``distutils.core.Extension`` call:
+
+.. code-block:: python
+
+    ext_module = distutils.core.Extension(
+        "denver",
+        sources=["denver.c"],
+        include_dirs=[r"c:\lpng166"],
+        library_dirs=[r"c:\lpng166\projects\vstudio\Debug"],
+        libraries=["libpng16"],
+    )
+
+You will need to adjust the ``include_dirs`` and ``library_dirs``
+to match the directory into which you extracted the libpng source code.
+
+With that done, you should still be able to compile your extension module:
+
+.. code-block:: python
+
+    python_d setup.py build_ext --debug --inplace
+
+
+Add png_dimensions() to Function Table
+--------------------------------------
+
+Just like with ``hello_world()`` and ``hello_you()``,
+the ``png_dimensions()`` function needs to be added to the ``PyMethodDef``
+function table.
+
+The line you need to add is below:
+
+.. code-block:: c
+
+    {"png_dimensions", denver_png_dimensions, METH_VARARGS, NULL},
+
+
 png_dimensions() Function Skeleton
 ----------------------------------
 
@@ -214,48 +257,8 @@ for your extension module (eg. ``denver.c``):
     }
 
 
-Add png_dimensions() to Function Table
---------------------------------------
-
-Just like with ``hello_world()`` and ``hello_you()``,
-the ``png_dimensions()`` function needs to be added to the ``PyMethodDef``
-function table.
-
-See if you can figure out yourself how to add it.
-If not, the line you need to add is below:
-
-.. code-block:: c
-
-    {"png_dimensions", denver_png_dimensions, METH_VARARGS, NULL},
-
-
-Compile and Try It
-------------------
-
-Before you can compile the module with ``png_dimensions()``,
-you need to update ``setup.py`` to tell it about libpng.
-Specifically, you need to add the
-``include_dirs``, ``library_dirs``, and ``libraries``
-arguments to the ``distutils.core.Extension`` call:
-
-.. code-block:: python
-
-    ext_module = distutils.core.Extension(
-        "denver",
-        sources=["denver.c"],
-        include_dirs=[r"c:\lpng166"],
-        library_dirs=[r"c:\lpng166\projects\vstudio\Debug"],
-        libraries=["libpng16"],
-    )
-
-You will need to adjust the ``include_dirs`` and ``library_dirs``
-to match the directory into which you extracted the libpng source code.
-
-With that done, you should now be able to compile your extension module:
-
-.. code-block:: python
-
-    python_d setup.py build_ext --debug --inplace
+Try It Out
+==========
 
 To *use* your extension module you will have to do one more thing:
 add the directory specified as ``library_dirs`` to your PATH.
