@@ -30,19 +30,26 @@ In this step you will compile libpng for yourself.
   1. Download the source code for the latest version of libpng
      (which at the time of writing is 1.6.6)
      from http://libpng.org/pub/png/libpng.html.
-  2. Extract the downloaded file
+  2. Download the source code for version 1.2.5 of zlib
+     from http://sourceforge.net/projects/libpng/files/zlib/1.2.5
+  3. Extract the downloaded file with the libpng source code
      (in my case ``lpng166.zip``)
      somewhere on your computer.
-  3. Open ``projects\vstudio\vstudio.sln`` in Visual Studio 2010
-  4. In the drop-down listbox at the top of the screen
-     change "Release" to "Debug Library"
+  4. Extract the downloaded file with the zlib source code
+     (in my case ``zlib125.zip``)
+     into the *same directory* that you extracted the libpng source code
+  5. Open ``projects\vstudio\vstudio.sln`` in Visual Studio 2010
+  6. In the drop-down listbox at the top of the screen
+     change "Release" to "Debug"
      (see screenshot below)
-  5. Press F7 to compile libpng; this should take less than 5 minutes
-
-.. image:: images/BuildConfigScreenshot.png
+  7. Press F7 to compile libpng; this should take less than 5 minutes
 
 If successful, the file ``projects\vstudio\Debug\libpng16.dll``
 will have been created.
+
+.. image:: images/ZipFilesScreenshot.png
+
+.. image:: images/BuildConfigScreenshot.png
 
 
 png_dimensions() Function Skeleton
