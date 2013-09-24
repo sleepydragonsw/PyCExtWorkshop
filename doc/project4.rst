@@ -52,7 +52,7 @@ this is such a common idiom that there is a helper function for just this purpos
 ``PyArg_ParseTuple()`` accepts the following arguments:
 
   1. ``args`` -- the arguments tuple with the arguments to parse
-  2. ``format`` -- a printf-style format indicating the expected arguments
+  2. ``format`` -- a printf-style format string indicating the expected arguments
   3. the rest of the arguments are
      pointers to variables in which to store
      the parsed and converted arguments, according to the given format
@@ -131,6 +131,11 @@ So the fully robust version of the method becomes:
        Py_RETURN_NONE;
    }
 
+Notice how the return value of ``PyArg_ParseTuple`` is used,
+and ``NULL`` is returned if it returns zero.
+
+
+
 Add the Function to the Function List
 -------------------------------------
 
@@ -197,11 +202,13 @@ It also correctly raises exceptions when invalid arguments are given:
       File "<stdin>", line 1, in <module>
     TypeError: function takes exactly 1 argument (0 given)
     [43277 refs]
+
     >>> denver.hello_you("a", "b")
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
     TypeError: function takes exactly 1 argument (2 given)
     [43279 refs]
+
     >>> denver.hello_you(123)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>

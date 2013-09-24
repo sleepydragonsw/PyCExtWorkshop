@@ -33,8 +33,16 @@ and conveniently ``hello_you()`` *also* returns a ``PyObject *``.
 This means that we can simply return the ``PyObject *``
 returned from ``PyInt_FromLong()`` from ``hello_you()``.
 
-With this change, the ``hello_you()`` function becomes:
+For example, to return the value ``100`` from the function,
+use the following code:
 
+.. code-block:: c
+
+    PyObject *retval = PyInt_FromLong(100);
+    return retval;
+
+Make the change to ``hello_you()`` to return to Python the return value from printf.
+Below is the solution, but see if you can do it on your own!
 
 .. code-block:: c
 
@@ -56,10 +64,10 @@ With this change, the ``hello_you()`` function becomes:
 
 Note how the return value of ``printf`` is saved into
 a ``long`` type variable named ``nCharsPrinted``.
-Then, ``PyInt_FromLong`` is invoked with ``nCharsPrinted``
+Then, ``PyInt_FromLong(nCharsPrinted)`` is invoked
 to create a ``PyObject *`` that represents the value of ``nCharsPrinted``.
 Then, the ``PyObject *`` is returned.
-Recall how previously the function used the ``Py_RETURN_NONE;`` macro
+Previously the function used the ``Py_RETURN_NONE;`` macro
 to return ``None`` from ``hello_you()``.
 
 

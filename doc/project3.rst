@@ -35,7 +35,7 @@ but so are ints, floats, strings, lists, dicts, True, False, and even None.
 
 Below is one way to write the "hello world" function
 that is capable of being called from Python.
-This code should immediately follow the *#include <Python.h>* line in *denver.c*:
+This code should immediately follow the ``#include <Python.h>`` line in *denver.c*:
 
 .. code-block:: c
 
@@ -65,7 +65,7 @@ Add the Function to the Function List
 -------------------------------------
 
 Do you remember the *PyMethodDef* list that ended with ``{NULL, NULL, 0, NULL}``
-that you added to your C file an earlier project?
+that you added to your C file in the last project?
 This is the list to which your new C function needs to be added
 in order to make it callable from Python.
 

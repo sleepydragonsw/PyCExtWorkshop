@@ -45,7 +45,7 @@ the reason for this is that Python.h
 Create Module's Function List
 .............................
 
-Unlike writing function in Python,
+Unlike writing functions in Python,
 when writing a C extension module
 the functions that will be included in the module
 need to be defined ahead of time.
@@ -72,7 +72,7 @@ that contains only the end-of-list sentinel, ``{NULL, NULL, 0, NULL}``.
 Create the Module Object
 ........................
 
-When an Python C extension module is loaded by the Python interpreter
+When a Python C extension module is loaded by the Python interpreter
 it calls a specially-named function
 that is responsible for creating the module object
 and populating it with values, functions, and classes.
@@ -133,7 +133,7 @@ On my computer, I ran the following:
 
     set PATH=c:\dev\Python-2.7.5-VS2010\Python-2.7.5\PCbuild;%PATH%
 
-Then, use *python.exe* (on Mac and Linux) or *python_d.exe* (on Windows)
+Then, use *python_d.exe* (on Windows) or *python.exe* (on Mac and Linux)
 to use your *setup.py* script to build the C extension module:
 
 .. code-block:: text
@@ -152,7 +152,8 @@ On my computer, it produced this output:
     c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\BIN\link.exe /DLL /nologo /INCREMENTAL:no /DEBUG /pdb:None /LIBPATH:c:\dev\Python-2.7.5-VS2010\Python-2.7.5\libs /LIBPATH:c:\dev\Python-2.7.5-VS2010\Python-2.7.5\PCbuild /EXPORT:initdenver build\temp.win32-2.7-pydebug\Debug\denver.obj /OUT:c:\dev\cpyextworkshop\denver_d.pyd /IMPLIB:build\temp.win32-2.7-pydebug\Debug\denver_d.lib /MANIFESTFILE:build\temp.win32-2.7-pydebug\Debug\denver_d.pyd.manifest /MANIFEST
        Creating library build\temp.win32-2.7-pydebug\Debug\denver_d.lib and object build\temp.win32-2.7-pydebug\Debug\denver_d.exp
 
-Finally, launch a Python interpreter and test out your newly-compiled module:
+Finally, launch a Python interpreter and test out your newly-compiled module.
+Remember to use *python_d.exe* on Windows, not *python.exe*.
 
 .. code-block:: text
 
