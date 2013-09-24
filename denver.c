@@ -166,14 +166,12 @@ denver_png_dimensions(
     // create Python int objects from the width and height
     widthObj = PyInt_FromLong(image_width);
     if (widthObj == NULL) {
-        PyErr_NoMemory();
         return NULL;
     }
 
     heightObj = PyInt_FromLong(image_height);
     if (heightObj == NULL) {
         Py_DECREF(widthObj);
-        PyErr_NoMemory();
         return NULL;
     }
 
@@ -182,7 +180,6 @@ denver_png_dimensions(
     if (retval == NULL) {
         Py_DECREF(widthObj);
         Py_DECREF(heightObj);
-        PyErr_NoMemory();
         return NULL;
     }
 
