@@ -14,6 +14,13 @@ in order to complete this project,
 along with some new things that will be introduced,
 such as raising exceptions, memory management, and using third-party DLLs.
 
+Here are some sample good and bad PNG files to play around with:
+
+  - :download:`test.png <../test.png>`
+  - :download:`test_bad1.png <../test_bad1.png>`
+  - :download:`test_bad2.png <../test_bad2.png>`
+  - :download:`test_bad3.png <../test_bad3.png>`
+  - :download:`test_bad4.png <../test_bad4.png>`
 
 Compile libpng
 --------------
