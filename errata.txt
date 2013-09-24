@@ -1,0 +1,15 @@
+ERRATA
+
+Project 7:
+  - You also need to download the source code for zlib 1.2.5
+    and extract it into the same directory as lpng
+  - Use the "Debug" build configuration instead of
+    "Debug Library"
+
+
+
+IMPROVEMENTS:
+   - Move setup.py steps in project 7 to above code chunk
+   - Give explicit paths to unzip stuff to
+   - Note code snippets that should NOT be copied into denver.c
+   - TODO 2 is busted until TODO 3 is completed
