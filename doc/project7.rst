@@ -259,14 +259,27 @@ Finally, try and invoke ``png_dimensions()`` from your Python interpreter:
     c:\dev\cpyextworkshop>python_d
     Python 2.7.5 (default, Sep 23 2013, 20:55:44) [MSC v.1600 32 bit (Intel)] on win32
     Type "help", "copyright", "credits" or "license" for more information.
+
     >>> import denver
     [43244 refs]
+
     >>> denver.png_dimensions()
     [43246 refs]
-    >>> ^Z
 
 Notice how ``png_dimensions()`` returned ``None``?
 In the steps to follow, we will update it to return a (width, height) tuple.
+
+If you see the following ImportError
+make sure that the directory you added to the PATH environment variable above
+contains libpng16.dll.
+Also, try setting the PATH environment variable again,
+as the change to the PATH will be lost if you start a new command prompt window.
+
+.. code-block:: text
+
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    ImportError: DLL load failed: The specified module could not be found.
 
 
 TODO 1: Parse the Function's Arguments
@@ -288,10 +301,10 @@ TODO 2: Raise IOError if opening the file fails
 Something we haven't talked about yet is how to raise Python exceptions from C.
 Since C does not natively support the concept of "exceptions"
 you have to instead "set" an exception,
-which will be thrown in Python once the C function returns.
+which will be raised in Python once the C function returns.
 After setting an exception, you *MUST* return ``NULL``;
 in fact, this is the *only* time that returning ``NULL``
-from a C extension function is allowed
+from a C extension function is allowed.
 
 The ``PyErr_`` family of functions are used to set a Python exception.
 For example,
@@ -355,7 +368,7 @@ Add the logic to raise a ValueError at the following markers:
     - TODO 3B (note: raise IOError here instead of ValueError)
     - TODO 3C
 
-As an advanced (and optinal) improvement, add useful context information
+As an advanced (and optional) improvement, add useful context information
 to the error message, such as the actual number of bytes read, using
 `PyErr_Format <http://docs.python.org/2/c-api/exceptions.html?#PyErr_Format>`_.
 
@@ -368,7 +381,7 @@ TODO 4: Raise OutOfMemoryError if memory is exhausted
 -----------------------------------------------------
 
 Although it doesn't happen often and is difficult to even test,
-it is important that you application not crash in the face of memory exhaustion.
+it is important that your application not crash in the face of memory exhaustion.
 The normal symptom of memory being exhausted is that a function
 that is supposed to create an object instead returns NULL.
 
@@ -380,7 +393,17 @@ Python has a special function for raising an out-of-memory error:
 
 .. code-block:: c
 
-     PyObject* PyErr_NoMemory()
+    PyObject* PyErr_NoMemory()
+
+Here is an example:
+
+.. code-block:: c
+
+    char *name = (char *) malloc(sizeof(char) * 100);
+    if (name == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
 
 Update the following markers to raise an out-of-memory error if memory is exhausted:
 
@@ -496,7 +519,7 @@ Make sure to perform the necessary Py_DECREF operations if creating the tuple fa
 BONUS 1: Use Py_BuildValue to create the tuple
 ----------------------------------------------
 
-There is actually an easier was to create the tuple:
+There is actually an easier way to create the tuple:
 `Py_BuildValue <http://docs.python.org/2/c-api/arg.html?#Py_BuildValue>`_.
 
 Change the code that creates the (width, height) tuple to use ``Py_BuildValue()``.
@@ -510,7 +533,7 @@ it is desirable to release the Global Interpreter Lock
 when performing potentially-long-running IO operations.
 In this code, the calls to ``fopen()`` and ``fread()``
 are just such functions,
-especially if they are opening files over a network.
+especially if they are operating on files over a network.
 
 Add code to release the GIL when calling fopen() and fread().
 

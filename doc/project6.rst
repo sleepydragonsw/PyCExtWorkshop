@@ -26,10 +26,11 @@ The GIL only needs to be held during times when Python objects
 are being created, deleted, accessed, or manipulated.
 In order to allow other threads to run,
 Python C extension modules should release the GIL
-whenever they perform an operation that does not require Python objects.
+whenever they perform potentially-long-running operations that do not require Python objects.
 This is especially true for I/O operations, like ``printf``,
 which actually take a "long time" to run
-and does not require access to any Python objects.
+(compared to reading/writing memory or performing arithmetic)
+and do not require access to any Python objects.
 
 To release the GIL use the
 `Py_BEGIN_ALLOW_THREADS <http://docs.python.org/2/c-api/init.html#Py_BEGIN_ALLOW_THREADS>`_
@@ -46,7 +47,10 @@ As an example, here is how to use the macro with the ``printf()`` function:
    nCharsPrinted = printf("Hello %s\n", name);
    Py_END_ALLOW_THREADS
 
-The complete, robust, and multithreading-friendly ``hello_you()`` function is now:
+Make the change to ``hello_world()`` and ``hello_you()``
+to release the GIL during the *printf* function call,
+making it robust and multithreading-friendly.
+Try not to peek at the solution below.
 
 .. code-block:: c
 
