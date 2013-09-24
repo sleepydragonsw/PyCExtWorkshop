@@ -17,6 +17,7 @@ Contents:
    project4
    project5
    project6
+   project7
 
 
 
